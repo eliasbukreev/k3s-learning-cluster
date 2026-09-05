@@ -1,0 +1,5 @@
+---
+#---
+dashboard_namespace: kubernetes-dashboard
+dashboard_release_name: kubernetes-dashboard
+dashboard_chart_version: "7.14.0"   # зафиксирован, чтобы деплой не зависел от свежих релизов чарта defaults file for roles/dashboard

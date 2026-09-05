@@ -1,0 +1,32 @@
+---
+- name: Deploy k3s
+  hosts: k3s_nodes
+  become: true
+  roles:
+    - role: common
+    - role: xanmanning.k3s
+
+- name: Collect kubeconfig on host machine
+  hosts: k3s_nodes
+  become: true
+  roles:
+    - role: kubeconfig_local
+      when: k3s_control_node | default(false)
+
+- name: Deploy kubernetes-dashboard
+  hosts: k3s_nodes
+  gather_facts: false
+  environment:
+    KUBECONFIG: "{{ kubeconfig_dir }}/{{ kubeconfig_name }}"
+  roles:
+    - role: dashboard
+      when: k3s_control_node | default(false)
+
+- name: Deploy monitoring stack
+  hosts: k3s_nodes
+  gather_facts: false
+  environment:
+    KUBECONFIG: "{{ kubeconfig_dir }}/{{ kubeconfig_name }}"   # те же vars из kubeconfig_local!
+  roles:
+    - role: monitoring
+      when: k3s_control_node | default(false)

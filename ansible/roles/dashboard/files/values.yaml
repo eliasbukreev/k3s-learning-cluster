@@ -1,0 +1,4 @@
+---
+kong:
+  proxy:
+    type: NodePort

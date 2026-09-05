@@ -1,0 +1,25 @@
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+.terraform.tfstate.lock.info
+*.tfplan
+*.tfvars
+.venv/
+
+# Ansible-generated files and local inventories
+ansible/inventory.ini
+ansible/inventory.json
+ansible/roles/xanmanning.k3s/
+*.retry
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local credentials and keys
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+VAULT_PASSWORD

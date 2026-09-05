@@ -1,0 +1,49 @@
+---
+- name: Deploy kube-prometheus-stack
+  kubernetes.core.helm:
+    name: "{{ monitoring_release_name }}"
+    namespace: "{{ monitoring_namespace }}"
+    chart_repo_url: https://prometheus-community.github.io/helm-charts
+    chart_ref: kube-prometheus-stack
+    chart_version: "{{ monitoring_chart_version }}"
+    create_namespace: true
+    timeout: "{{ monitoring_helm_timeout }}"
+    values_files:
+      - "{{ role_path }}/files/values.yaml"
+    state: present
+  delegate_to: localhost
+  become: false
+
+- name: Read grafana service
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Service
+    name: "{{ monitoring_release_name }}-grafana"   # шаблон имени: <release>-grafana
+    namespace: "{{ monitoring_namespace }}"
+  register: monitoring_grafana_svc
+  delegate_to: localhost
+  become: false
+  retries: 10
+  delay: 5
+  until: monitoring_grafana_svc.resources | length > 0
+
+- name: Read grafana admin password
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: "{{ monitoring_release_name }}-grafana"
+    namespace: "{{ monitoring_namespace }}"
+  register: monitoring_grafana_secret
+  delegate_to: localhost
+  become: false
+  retries: 10
+  delay: 5
+  until: >-
+    monitoring_grafana_secret.resources | length > 0
+    and monitoring_grafana_secret.resources[0].data['admin-password'] is defined
+
+- name: Show grafana access info
+  ansible.builtin.debug:
+    msg:
+      - "Grafana URL: http://{{ ansible_host }}:{{ monitoring_grafana_svc.resources[0].spec.ports[0].nodePort }}"
+      - "Login: admin / {{ monitoring_grafana_secret.resources[0].data['admin-password'] | b64decode }}"

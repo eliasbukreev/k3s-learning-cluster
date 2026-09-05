@@ -1,0 +1,24 @@
+vms = {
+  k3s-server = {
+    memory = 2048
+    vcpu   = 2
+    disk   = 20
+    ip     = "192.168.122.10"
+    user   = "admin"
+    role   = "server"
+  }
+
+  k3s-agent-1 = {
+    memory = 2048
+    vcpu   = 2
+    disk   = 20
+    ip     = "192.168.122.11"
+    user   = "admin"
+    role   = "agent"
+  }
+}
+
+ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEXAMPLEKEYMUSTBEREPLACED example@example.invalid"
+
+# Change this to the gateway of the libvirt network used by the VMs.
+network_gateway = "192.168.122.1"

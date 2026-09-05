@@ -1,0 +1,8 @@
+---
+grafana:
+  service:
+    type: NodePort        # иначе ClusterIP и снаружи не достучишься (servicelb у тебя выключен)
+
+prometheus:
+  prometheusSpec:
+    retention: 3d 

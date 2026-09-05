@@ -1,0 +1,19 @@
+---
+k3s_server:
+  disable:
+    - servicelb
+  node-taint:
+    - "CriticalAddonsOnly=true:NoExecute"
+
+k3s_become: true
+
+common_packages:
+  - htop
+  - curl
+  - vim
+  - git
+  - wget
+  - ranger
+
+kubeconfig_dir: "{{ lookup('env', 'HOME') }}/.kube"
+kubeconfig_name: config-k3s-learning

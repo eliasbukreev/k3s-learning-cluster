@@ -1,0 +1,31 @@
+---
+# tasks file for roles/kubeconfig_local
+- name: Ensure ~/.kube exists on controller
+  ansible.builtin.file:
+    path: "{{ kubeconfig_dir }}"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+  become: false
+
+- name: Fetch k3s kubeconfig from control node
+  ansible.builtin.fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "{{ kubeconfig_dir }}/{{ kubeconfig_name }}"
+    flat: true          # иначе положит в дебри ~/.kube/debian01/etc/rancher/...
+  become: true          # файл принадлежит root и имеет 600
+
+- name: Point kubeconfig at node IP instead of 127.0.0.1
+  ansible.builtin.replace:
+    path: "{{ kubeconfig_dir }}/{{ kubeconfig_name }}"
+    regexp: "server: https://127\\.0\\.0\\.1"
+    replace: "server: https://{{ ansible_host }}"
+  delegate_to: localhost
+  become: false
+
+- name: Restrict kubeconfig permissions (cluster-admin credentials!)
+  ansible.builtin.file:
+    path: "{{ kubeconfig_dir }}/{{ kubeconfig_name }}"
+    mode: "0600"
+  delegate_to: localhost
+  become: false
